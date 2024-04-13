@@ -11,7 +11,7 @@ import { RootLayout } from "./pages/RootLayout";
 import { AuthContext, AuthContextProvider } from "./components/AuthContext";
 import { useContext } from "react";
 import { LoginPage } from "./pages/LoginPage";
-// import { RegisterPage } from "./pages/RegisterPage";
+import { RegisterPage } from "./pages/RegisterPage";
 // import { NotFoundPage } from "./pages/NotFoundPage";
 // import { ProfilePage } from "./pages/ProfilePage";
 
@@ -35,8 +35,10 @@ export const App = () => {
         {/* <Route element={<ProtectedRoute />}>
           <Route path="profile" element={<ProfilePage />} />
         </Route> */}
-        {/* <Route path="/register" element={<RegisterPage />} /> */}
+        <Route path="/register" element={<RegisterPage />} />
+
         <Route path="/login" element={<LoginPage />} />
+
         {/* <Route path="*" element={<NotFoundPage />} /> */}
       </Route>
     )
