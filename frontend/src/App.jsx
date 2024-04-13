@@ -12,7 +12,7 @@ import { AuthContext, AuthContextProvider } from "./components/AuthContext";
 import { useContext } from "react";
 import { LoginPage } from "./pages/LoginPage";
 import { RegisterPage } from "./pages/RegisterPage";
-// import { NotFoundPage } from "./pages/NotFoundPage";
+import { NotFoundPage } from "./pages/NotFoundPage";
 // import { ProfilePage } from "./pages/ProfilePage";
 
 const ProtectedRoute = () => {
@@ -39,7 +39,7 @@ export const App = () => {
 
         <Route path="/login" element={<LoginPage />} />
 
-        {/* <Route path="*" element={<NotFoundPage />} /> */}
+        <Route path="*" element={<NotFoundPage />} />
       </Route>
     )
   );
