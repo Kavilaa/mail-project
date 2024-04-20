@@ -1,5 +1,5 @@
 import express from "express";
-import Email from "../models/Email.js"; // Assuming Email is exported from Email.js
+import Email from "../models/Email.js";
 import auth from "../middleware/auth.js";
 const router = express.Router();
 

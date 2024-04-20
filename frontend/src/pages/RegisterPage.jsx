@@ -19,9 +19,21 @@ export const RegisterPage = () => {
   const navigate = useNavigate();
 
   const registerUser = async (registerValues) => {
-    const response = await axiosInstance.post("/user/register", registerValues);
-    setUser(response.data.user);
-    navigate("/");
+    try {
+      const response = await axiosInstance.post(
+        "/user/register",
+        registerValues
+      );
+      setUser(response.data.user);
+      navigate("/home");
+    } catch (error) {
+      if (error.response && error.response.status === 409) {
+        console.error("Email already registered");
+        alert("Email is already registered. Please try a different email.");
+      } else {
+        console.error("Registration error:", error);
+      }
+    }
   };
 
   return (

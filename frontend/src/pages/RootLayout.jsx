@@ -32,17 +32,22 @@ export const RootLayout = () => {
             <ul className="flex gap-2">
               <li>
                 <ActiveLinkButton variant="outline" to="/">
-                  <span className="hidden md:inline-block">All products</span>
-                </ActiveLinkButton>
-              </li>
-              <li>
-                <ActiveLinkButton variant="outline" to="/manage">
-                  <span className="hidden md:inline-block">Manage</span>
+                  <span className="hidden md:inline-block">Inbox</span>
                 </ActiveLinkButton>
               </li>
               <li>
                 <ActiveLinkButton variant="outline" to="/profile">
-                  <span className="hidden md:inline-block">Profile</span>
+                  <span className="hidden md:inline-block">Sent</span>
+                </ActiveLinkButton>
+              </li>
+              <li>
+                <ActiveLinkButton variant="outline" to="/profile">
+                  <span className="hidden md:inline-block">Archived</span>
+                </ActiveLinkButton>
+              </li>
+              <li>
+                <ActiveLinkButton variant="outline" to="/profile">
+                  <span className="hidden md:inline-block">Compose</span>
                 </ActiveLinkButton>
               </li>
             </ul>

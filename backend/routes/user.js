@@ -8,6 +8,12 @@ const router = express.Router();
 router.post("/register", async (req, res, next) => {
   try {
     const { email, password } = req.body;
+
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(409).json({ message: "Email is already registered" });
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = await User.create({ email, password: hashedPassword });
     req.session.userId = user._id;
@@ -51,6 +57,23 @@ router.get("/status", auth, async (req, res, next) => {
       return res.status(404).json({ message: "User not found" });
     }
     res.json({ email: user.email, _id: user._id });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get("/home", auth, async (req, res, next) => {
+  try {
+    const user = await User.findById(req.session.userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json({
+      email: user.email,
+      _id: user._id,
+      message: "Welcome to the home page!",
+    });
   } catch (error) {
     next(error);
   }
