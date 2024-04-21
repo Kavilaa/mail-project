@@ -10,9 +10,19 @@ export const RootLayout = () => {
   const navigate = useNavigate();
 
   const logoutUser = async () => {
-    await axiosInstance.delete("/user/logout");
-    setUser(null);
-    navigate("/");
+    try {
+      await axiosInstance.delete("/user/logout", { withCredentials: true });
+      setUser(null);
+      navigate("/");
+    } catch (error) {
+      if (error.response && error.response.status === 401) {
+        console.error("Unauthorized access - Unable to log out.");
+        setUser(null);
+        navigate("/");
+      } else {
+        console.error("Error during logout:", error);
+      }
+    }
   };
 
   return (
@@ -36,22 +46,23 @@ export const RootLayout = () => {
                 </ActiveLinkButton>
               </li>
               <li>
-                <ActiveLinkButton variant="outline" to="/profile">
+                <ActiveLinkButton variant="outline" to="/sent">
                   <span className="hidden md:inline-block">Sent</span>
                 </ActiveLinkButton>
               </li>
               <li>
-                <ActiveLinkButton variant="outline" to="/profile">
+                <ActiveLinkButton variant="outline" to="/archived">
                   <span className="hidden md:inline-block">Archived</span>
                 </ActiveLinkButton>
               </li>
               <li>
-                <ActiveLinkButton variant="outline" to="/profile">
+                <ActiveLinkButton variant="outline" to="/compose">
                   <span className="hidden md:inline-block">Compose</span>
                 </ActiveLinkButton>
               </li>
             </ul>
             <div className="flex items-center gap-4">
+              <span>{user.email}</span>
               <Button variant="outline" onClick={logoutUser}>
                 <span className="hidden md:inline-block">Log out</span>
               </Button>

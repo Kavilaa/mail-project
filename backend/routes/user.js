@@ -62,21 +62,4 @@ router.get("/status", auth, async (req, res, next) => {
   }
 });
 
-router.get("/home", auth, async (req, res, next) => {
-  try {
-    const user = await User.findById(req.session.userId);
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    res.json({
-      email: user.email,
-      _id: user._id,
-      message: "Welcome to the home page!",
-    });
-  } catch (error) {
-    next(error);
-  }
-});
-
 export default router;

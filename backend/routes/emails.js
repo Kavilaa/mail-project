@@ -24,6 +24,28 @@ router.post("/", auth, async (req, res, next) => {
   }
 });
 
+router.post("/compose", auth, async (req, res, next) => {
+  try {
+    const { recipients, subject, body } = req.body;
+
+    if (!recipients || !subject || !body) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+
+    const email = await Email.create({
+      sender: req.user.email,
+      recipients,
+      subject,
+      body,
+      sentAt: new Date(),
+    });
+
+    res.status(201).json(email);
+  } catch (error) {
+    next(error);
+  }
+});
+
 router.get("/c/:emailCategory", auth, async (req, res, next) => {
   try {
     const emailCategory = req.params.emailCategory.toLowerCase();

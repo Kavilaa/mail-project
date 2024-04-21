@@ -6,25 +6,40 @@ import { AuthContext } from "../components/AuthContext";
 import { Button } from "../components/ui/button";
 import { Label } from "../components/ui/label";
 import { Input } from "../components/ui/input";
+import * as Yup from "yup";
 
 export const LoginPage = () => {
   const initialValues = {
     email: "",
     password: "",
   };
+
+  const validationSchema = Yup.object().shape({
+    email: Yup.string()
+      .email("Must be a valid email")
+      .required("Email is required"),
+    password: Yup.string()
+      // .min(8, "Password must be at least 8 characters")
+      .required("Password is required"),
+  });
+
   const { setUser } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const loginUser = async (loginValues, { setSubmitting }) => {
     const response = await axiosInstance.post("/user/login", loginValues);
-    setUser(response.data.user);
+    setUser(response.data);
     setSubmitting(false);
     navigate("/");
   };
 
   return (
     <div className="max-w-xs mx-auto my-4 flex flex-col gap-4">
-      <Formik initialValues={initialValues} onSubmit={loginUser}>
+      <Formik
+        initialValues={initialValues}
+        validationSchema={validationSchema}
+        onSubmit={loginUser}
+      >
         {(formikProps) => {
           return (
             <Form className="flex flex-col gap-4">

@@ -13,7 +13,9 @@ import { useContext } from "react";
 import { LoginPage } from "./pages/LoginPage";
 import { RegisterPage } from "./pages/RegisterPage";
 import { NotFoundPage } from "./pages/NotFoundPage";
-// import { ProfilePage } from "./pages/ProfilePage";
+import { SentPage } from "./pages/SentPage";
+import { ArchivedPage } from "./pages/ArchivedPage";
+import { ComposePage } from "./pages/ComposePage";
 
 const ProtectedRoute = () => {
   const { user, initialLoading } = useContext(AuthContext);
@@ -31,10 +33,12 @@ export const App = () => {
   const router = createBrowserRouter(
     createRoutesFromElements(
       <Route path="/" element={<RootLayout />}>
-        {/* <Route index element={<div>Products page</div>} /> */}
-        {/* <Route element={<ProtectedRoute />}>
-          <Route path="profile" element={<ProfilePage />} />
-        </Route> */}
+        <Route element={<ProtectedRoute />}>
+          <Route path="/sent" element={<SentPage />} />
+          <Route path="/archived" element={<ArchivedPage />} />
+          <Route path="/compose" element={<ComposePage />} />
+        </Route>
+
         <Route path="/register" element={<RegisterPage />} />
 
         <Route path="/login" element={<LoginPage />} />

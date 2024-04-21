@@ -6,28 +6,14 @@ import { AuthContext } from "../components/AuthContext";
 import { Button } from "../components/ui/button";
 import { Label } from "../components/ui/label";
 import { Input } from "../components/ui/input";
-import * as Yup from "yup";
 
-export const RegisterPage = () => {
+export const SentPage = () => {
   const initialValues = {
     username: "",
     email: "",
     password: "",
     confirmPassword: "",
   };
-
-  const validationSchema = Yup.object().shape({
-    username: Yup.string().required("Username is required"),
-    email: Yup.string()
-      .email("Must be a valid email")
-      .required("Email is required"),
-    password: Yup.string()
-      .min(8, "Password must be at least 8 characters")
-      .required("Password is required"),
-    confirmPassword: Yup.string()
-      .oneOf([Yup.ref("password"), null], "Passwords must match")
-      .required("Confirm password is required"),
-  });
 
   const { setUser } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -52,11 +38,7 @@ export const RegisterPage = () => {
 
   return (
     <div className="max-w-xs mx-auto my-4">
-      <Formik
-        initialValues={initialValues}
-        validationSchema={validationSchema}
-        onSubmit={registerUser}
-      >
+      <Formik initialValues={initialValues} onSubmit={registerUser}>
         {(formikProps) => {
           return (
             <Form className="flex flex-col gap-4">
