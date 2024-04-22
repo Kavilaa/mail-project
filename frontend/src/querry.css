@@ -1,0 +1,21 @@
+li span {
+  display: inline-block;
+}
+li img {
+  display: none;
+}
+
+@media (max-width: 720px) {
+  .icon span {
+    display: none;
+  }
+  .icon img {
+    display: inline-block;
+  }
+  li span {
+    display: none;
+  }
+  li img {
+    display: inline-block;
+  }
+}

@@ -4,6 +4,14 @@ import { AuthContext } from "../components/AuthContext";
 import { ActiveLinkButton, Button } from "../components/ui/button";
 import { Skeleton } from "../components/ui/skeleton";
 import { axiosInstance } from "../lib/axiosInstance";
+import "../querry.css";
+import archived from "../assets/archived.svg";
+import compose from "../assets/compose.svg";
+import inbox from "../assets/inbox.svg";
+import logout from "../assets/logout.svg";
+import login from "../assets/login.svg";
+import register from "../assets/register.svg";
+import sent from "../assets/sent.svg";
 
 export const RootLayout = () => {
   const { user, initialLoading, setUser } = useContext(AuthContext);
@@ -41,40 +49,67 @@ export const RootLayout = () => {
           <>
             <ul className="flex gap-2">
               <li>
-                <ActiveLinkButton variant="outline" to="/inbox">
-                  <span className="hidden md:inline-block">Inbox</span>
+                <ActiveLinkButton
+                  variant="outline"
+                  to="/inbox"
+                  className="button"
+                >
+                  <img src={inbox} alt="Inbox icon" className="icon" />
+                  <span>Inbox</span>
                 </ActiveLinkButton>
               </li>
               <li>
-                <ActiveLinkButton variant="outline" to="/sent">
-                  <span className="hidden md:inline-block">Sent</span>
+                <ActiveLinkButton
+                  variant="outline"
+                  to="/sent"
+                  className="button"
+                >
+                  <img src={sent} alt="Sent icon" className="icon" />
+                  <span>Sent</span>
                 </ActiveLinkButton>
               </li>
               <li>
-                <ActiveLinkButton variant="outline" to="/archived">
-                  <span className="hidden md:inline-block">Archived</span>
+                <ActiveLinkButton
+                  variant="outline"
+                  to="/archived"
+                  className="button"
+                >
+                  <img src={archived} alt="Archived icon" className="icon" />
+                  <span>Archived</span>
                 </ActiveLinkButton>
               </li>
               <li>
-                <ActiveLinkButton variant="outline" to="/compose">
-                  <span className="hidden md:inline-block">Compose</span>
+                <ActiveLinkButton
+                  variant="outline"
+                  to="/compose"
+                  className="button"
+                >
+                  <img src={compose} alt="Compose icon" className="icon" />
+                  <span>Compose</span>
                 </ActiveLinkButton>
               </li>
             </ul>
             <div className="flex items-center gap-4">
               <span>{user.email}</span>
-              <Button variant="outline" onClick={logoutUser}>
-                <span className="hidden md:inline-block">Log out</span>
+              <Button variant="outline" onClick={logoutUser} className="button">
+                <img src={logout} alt="Log out icon" className="icon" />
+                <span>Log out</span>
               </Button>
             </div>
           </>
         ) : (
           <div className="flex items-center gap-4 ml-auto">
-            <ActiveLinkButton variant="outline" to="login">
-              <span className="hidden md:inline-block">Login</span>
+            <ActiveLinkButton variant="outline" to="login" className="button">
+              <img src={login} alt="Login icon" className="icon" />
+              <span>Login</span>
             </ActiveLinkButton>
-            <ActiveLinkButton variant="outline" to="register">
-              <span className="hidden md:inline-block">Register</span>
+            <ActiveLinkButton
+              variant="outline"
+              to="register"
+              className="button"
+            >
+              <img src={register} alt="Register icon" className="icon" />
+              <span>Register</span>
             </ActiveLinkButton>
           </div>
         )}
