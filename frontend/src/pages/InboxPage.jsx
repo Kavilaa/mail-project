@@ -1,26 +1,27 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { axiosInstance } from "../lib/axiosInstance";
 import { useContext } from "react";
 import { AuthContext } from "../components/AuthContext";
+import { useNavigate } from "react-router-dom";
 
-export const SentPage = () => {
-  const [sentEmails, setSentEmails] = useState([]);
+export const InboxPage = () => {
+  const [emails, setEmails] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
 
-  const fetchSentEmails = async () => {
+  const fetchEmails = async () => {
     try {
       const headers = {
         Authorization: `Bearer ${user._id}`,
       };
-      const response = await axiosInstance.get("/emails/sent", { headers });
-      setSentEmails(response.data);
+
+      const response = await axiosInstance.get("/", { headers });
+      setEmails(response.data);
       setError(null);
     } catch (err) {
-      console.error("Error fetching sent emails:", err);
+      console.error("Error fetching emails:", err);
       setError(err);
     } finally {
       setLoading(false);
@@ -28,27 +29,27 @@ export const SentPage = () => {
   };
 
   useEffect(() => {
-    fetchSentEmails();
+    fetchEmails();
   }, [user]);
 
   if (loading) {
-    return <div>Loading sent emails...</div>;
+    return <div>Loading emails...</div>;
   }
 
   if (error) {
     return (
       <div>
-        <p>Error fetching sent emails. Please try again later.</p>
-        <button onClick={fetchSentEmails}>Retry</button>{" "}
+        <p>Error fetching emails. Please try again later.</p>
+        <button onClick={fetchEmails}>Retry</button>{" "}
       </div>
     );
   }
 
   return (
     <div>
-      <h2>Sent Emails</h2>
+      <h2>Your Emails</h2>
       <ul>
-        {sentEmails.map((email) => (
+        {emails.map((email) => (
           <li key={email._id}>
             <strong>{email.subject}</strong> - {email.body}
           </li>

@@ -1,37 +1,36 @@
-import React, { createContext, useEffect, useState } from "react";
+import React, { createContext, useState, useEffect } from "react";
 import { axiosInstance } from "../lib/axiosInstance";
 
-export const AuthContext = createContext({
-  user: null,
-  setUser: () => {},
-  initialLoading: true,
-});
+export const AuthContext = createContext();
 
 export const AuthContextProvider = ({ children }) => {
-  const [initialLoading, setInitialLoading] = useState(true);
   const [user, setUser] = useState(null);
-  const checkStatus = async () => {
-    try {
-      const response = await axiosInstance.get("/user/status");
-      setUser(response.data.user);
-    } catch (error) {
-      if (error.response && error.response.status === 401) {
-        console.error("Unauthorized access - Redirecting to login.");
-        setUser(null);
-      } else {
-        console.error("Error checking user status:", error);
-      }
-    } finally {
-      setInitialLoading(false);
-    }
-  };
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    checkStatus();
+    const persistedUser = sessionStorage.getItem("user");
+    if (persistedUser) {
+      setUser(JSON.parse(persistedUser));
+    }
+    setLoading(false);
   }, []);
 
+  useEffect(() => {
+    if (user) {
+      sessionStorage.setItem("user", JSON.stringify(user));
+    } else {
+      sessionStorage.removeItem("user");
+    }
+  }, [user]);
+
+  const logout = async () => {
+    await axiosInstance.post("/user/logout");
+    setUser(null);
+    sessionStorage.removeItem("user");
+  };
+
   return (
-    <AuthContext.Provider value={{ user, setUser, initialLoading }}>
+    <AuthContext.Provider value={{ user, setUser, loading, logout }}>
       {children}
     </AuthContext.Provider>
   );

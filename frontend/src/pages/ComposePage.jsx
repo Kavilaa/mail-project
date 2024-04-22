@@ -38,7 +38,7 @@ export const ComposePage = () => {
       const response = await axiosInstance.post("/emails/compose", values);
 
       console.log("Email sent successfully:", response.data);
-      navigate("/sent");
+      navigate("/");
     } catch (error) {
       console.error("Error sending email:", error);
 

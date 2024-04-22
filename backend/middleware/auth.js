@@ -1,18 +1,11 @@
-import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 
 const auth = async (req, res, next) => {
   try {
-    const token = req.session.token;
-    if (!token) {
+    if (!req.session.userId) {
       return res.status(401).json({ message: "Unauthorized" });
     }
-    const decoded = jwt.verify(token, "your_secret_key");
-    const user = await User.findById(decoded.userId);
-    if (!user) {
-      return res.status(401).json({ message: "Unauthorized" });
-    }
-    req.user = user;
+    req.user = await User.findById(req.session.userId);
     next();
   } catch (error) {
     next(error);

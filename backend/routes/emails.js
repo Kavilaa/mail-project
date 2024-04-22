@@ -80,6 +80,36 @@ router.get("/:emailId", auth, async (req, res, next) => {
   }
 });
 
+router.get("/sent", auth, async (req, res, next) => {
+  try {
+    const sentEmails = await Email.find({
+      sender: req.user.email,
+      archived: false,
+    }).sort({ sentAt: -1 });
+
+    res.json(sentEmails);
+  } catch (error) {
+    console.error("Error fetching sent emails:", error);
+    res.status(500).json({ message: "Internal server error" });
+    next(error);
+  }
+});
+
+router.get("/inbox", auth, async (req, res, next) => {
+  try {
+    const receivedEmails = await Email.find({
+      recipients: req.user.email,
+      archived: false, // Exclude archived emails
+    }).sort({ sentAt: -1 });
+
+    res.json(receivedEmails);
+  } catch (error) {
+    console.error("Error fetching received emails:", error);
+    res.status(500).json({ message: "Internal server error" });
+    next(error);
+  }
+});
+
 router.patch("/:emailId", auth, async (req, res, next) => {
   try {
     const { archived } = req.body;

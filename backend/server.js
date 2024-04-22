@@ -43,6 +43,7 @@ app.use(
 
 app.use("/user", userRoutes);
 app.use("/emails", emailRoutes);
+app.use("/", emailRoutes);
 
 app.use(errorHandler);
 

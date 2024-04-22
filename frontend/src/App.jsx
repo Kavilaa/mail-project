@@ -16,6 +16,7 @@ import { NotFoundPage } from "./pages/NotFoundPage";
 import { SentPage } from "./pages/SentPage";
 import { ArchivedPage } from "./pages/ArchivedPage";
 import { ComposePage } from "./pages/ComposePage";
+import { InboxPage } from "./pages/InboxPage";
 
 const ProtectedRoute = () => {
   const { user, initialLoading } = useContext(AuthContext);
@@ -34,6 +35,7 @@ export const App = () => {
     createRoutesFromElements(
       <Route path="/" element={<RootLayout />}>
         <Route element={<ProtectedRoute />}>
+          <Route path="/inbox" element={<InboxPage />} />
           <Route path="/sent" element={<SentPage />} />
           <Route path="/archived" element={<ArchivedPage />} />
           <Route path="/compose" element={<ComposePage />} />

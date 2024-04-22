@@ -41,7 +41,7 @@ export const RootLayout = () => {
           <>
             <ul className="flex gap-2">
               <li>
-                <ActiveLinkButton variant="outline" to="/">
+                <ActiveLinkButton variant="outline" to="/inbox">
                   <span className="hidden md:inline-block">Inbox</span>
                 </ActiveLinkButton>
               </li>
