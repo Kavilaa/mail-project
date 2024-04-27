@@ -66,6 +66,25 @@ router.get("/c/:emailCategory", auth, async (req, res, next) => {
   }
 });
 
+router.get("/c/archived", auth, async (req, res, next) => {
+  try {
+    // Find archived emails
+    const archivedEmails = await Email.find({ archived: true }).sort({
+      sentAt: -1,
+    });
+
+    // Log retrieved emails
+    console.log("Archived Emails from database:", archivedEmails);
+
+    // Return retrieved emails
+    res.json(archivedEmails);
+  } catch (error) {
+    console.error("Error fetching archived emails:", error);
+    res.status(500).json({ message: "Internal server error" });
+    next(error);
+  }
+});
+
 router.get("/:emailId", auth, async (req, res, next) => {
   try {
     const email = await Email.findById(req.params.emailId);
@@ -99,7 +118,7 @@ router.get("/inbox", auth, async (req, res, next) => {
   try {
     const receivedEmails = await Email.find({
       recipients: req.user.email,
-      archived: false, // Exclude archived emails
+      archived: false,
     }).sort({ sentAt: -1 });
 
     res.json(receivedEmails);

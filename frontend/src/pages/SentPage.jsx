@@ -14,9 +14,9 @@ export const SentPage = () => {
   const fetchSentEmails = async () => {
     try {
       const headers = {
-        Authorization: `Bearer ${user._id}`,
+        Authorization: `Bearer ${user.token}`,
       };
-      const response = await axiosInstance.get("/emails/sent", { headers });
+      const response = await axiosInstance.get("/c/sent", { headers });
       setSentEmails(response.data);
       setError(null);
     } catch (err) {

@@ -1,126 +1,81 @@
-import { Form, Formik, ErrorMessage } from "formik";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
 import { axiosInstance } from "../lib/axiosInstance";
 import { useContext } from "react";
 import { AuthContext } from "../components/AuthContext";
-import { Button } from "../components/ui/button";
-import { Label } from "../components/ui/label";
-import { Input } from "../components/ui/input";
 
 export const ArchivedPage = () => {
-  const initialValues = {
-    username: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
+  const [archivedEmails, setArchivedEmails] = useState([]);
+  const { user } = useContext(AuthContext);
+
+  const fetchArchivedEmails = async () => {
+    try {
+      const headers = {
+        Authorization: `Bearer ${user.token}`,
+      };
+      // Send a GET request to fetch archived emails
+      const response = await axiosInstance.get("/c/archived", { headers });
+
+      // Log the response data for debugging
+      console.log("Response data:", response.data);
+
+      // Update the archivedEmails state with the response data
+      setArchivedEmails(response.data);
+    } catch (err) {
+      console.error("Error fetching archived emails:", err);
+      // Optional: Display error message to the user
+    }
   };
 
-  const { setUser } = useContext(AuthContext);
-  const navigate = useNavigate();
+  useEffect(() => {
+    // Call the function to fetch archived emails when the component mounts
+    fetchArchivedEmails();
+  }, []);
 
-  const registerUser = async (registerValues) => {
+  const handleUnarchive = async (emailId) => {
     try {
-      const response = await axiosInstance.post(
-        "/user/register",
-        registerValues
+      // Send a PATCH request to unarchive the email
+      const response = await axiosInstance.patch(`/emails/${emailId}`, {
+        archived: false,
+      });
+
+      // Log the response data for debugging
+      console.log("Response from unarchive:", response.data);
+
+      // Update the archivedEmails state by removing the unarchived email
+      setArchivedEmails((prevEmails) =>
+        prevEmails.filter((email) => email._id !== emailId)
       );
-      setUser(response.data.user);
-      navigate("/login");
-    } catch (error) {
-      if (error.response && error.response.status === 409) {
-        console.error("Email already registered");
-        alert("Email is already registered. Please try a different email.");
-      } else {
-        console.error("Registration error:", error);
-      }
+    } catch (err) {
+      console.error("Error unarchiving email:", err);
+      // Optional: Display error message to the user
     }
   };
 
   return (
-    <div className="max-w-xs mx-auto my-4">
-      <Formik initialValues={initialValues} onSubmit={registerUser}>
-        {(formikProps) => {
-          return (
-            <Form className="flex flex-col gap-4">
-              <div>
-                <Label htmlFor="username" className="mb-4 block">
-                  Username
-                </Label>
-                <Input
-                  id="username"
-                  type="text"
-                  {...formikProps.getFieldProps("username")}
-                />
-                <ErrorMessage
-                  name="username"
-                  component="span"
-                  className="text-red-600 text-sm"
-                />
-              </div>
-              <div>
-                <Label htmlFor="email" className="mb-4 block">
-                  Email
-                </Label>
-                <Input
-                  id="email"
-                  type="text"
-                  {...formikProps.getFieldProps("email")}
-                />
-                <ErrorMessage
-                  name="email"
-                  component="span"
-                  className="text-red-600 text-sm"
-                />
-              </div>
-              <div>
-                <Label htmlFor="password" className="mb-4 block">
-                  Password
-                </Label>
-                <Input
-                  id="password"
-                  type="password"
-                  {...formikProps.getFieldProps("password")}
-                />
-                <ErrorMessage
-                  name="password"
-                  component="span"
-                  className="text-red-600 text-sm"
-                />
-              </div>
-              <div>
-                <Label htmlFor="confirmPassword" className="mb-4 block">
-                  Confirm password
-                </Label>
-                <Input
-                  id="confirmPassword"
-                  type="password"
-                  {...formikProps.getFieldProps("confirmPassword")}
-                />
-                <ErrorMessage
-                  name="confirmPassword"
-                  component="span"
-                  className="text-red-600 text-sm"
-                />
-              </div>
-              <div className="flex items-center gap-4 justify-between">
-                <span>
-                  Already have an account?{" "}
-                  <Link className="text-blue-500" to="/login">
-                    Login
-                  </Link>
-                </span>
-                <Button
-                  type="submit"
-                  className="self-end"
-                  disabled={formikProps.isSubmitting}
-                >
-                  Register
-                </Button>
-              </div>
-            </Form>
-          );
-        }}
-      </Formik>
+    <div>
+      <h2>Archived Emails</h2>
+      <div>
+        {archivedEmails.map((email) => (
+          <div key={email._id}>
+            <strong>{email.subject}</strong>
+            <div style={{ marginTop: "10px" }}>
+              <p>{email.body}</p>
+              <p>
+                <strong>From:</strong> {email.from}
+              </p>
+              <p>
+                <strong>To:</strong> {email.to}
+              </p>
+              <p>
+                <strong>Date:</strong> {email.date}
+              </p>
+              <button onClick={() => handleUnarchive(email._id)}>
+                Unarchive
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
