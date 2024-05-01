@@ -12,23 +12,39 @@ export const SentPage = () => {
   const { user } = useContext(AuthContext);
 
   const fetchSentEmails = async () => {
+    console.log("User object:", user);
+    console.log("User token:", user ? user.token : "undefined");
+
+    if (!user || !user.token) {
+      console.error("User or token is missing. Cannot fetch sent emails.");
+      return;
+    }
+
     try {
       const headers = {
         Authorization: `Bearer ${user.token}`,
       };
       const response = await axiosInstance.get("/c/sent", { headers });
+
+      console.log("Data received from /c/sent:", response.data);
+
       setSentEmails(response.data);
       setError(null);
     } catch (err) {
       console.error("Error fetching sent emails:", err);
-      setError(err);
+      setError(
+        err.response?.data?.message ||
+          "An error occurred while fetching sent emails."
+      );
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchSentEmails();
+    if (user) {
+      fetchSentEmails();
+    }
   }, [user]);
 
   if (loading) {

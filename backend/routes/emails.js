@@ -68,15 +68,15 @@ router.get("/c/:emailCategory", auth, async (req, res, next) => {
 
 router.get("/c/archived", auth, async (req, res, next) => {
   try {
-    // Find archived emails
+    // Query the database for archived emails
     const archivedEmails = await Email.find({ archived: true }).sort({
       sentAt: -1,
     });
 
-    // Log retrieved emails
+    // Log the results of the database query
     console.log("Archived Emails from database:", archivedEmails);
 
-    // Return retrieved emails
+    // Return the archived emails
     res.json(archivedEmails);
   } catch (error) {
     console.error("Error fetching archived emails:", error);
@@ -99,31 +99,36 @@ router.get("/:emailId", auth, async (req, res, next) => {
   }
 });
 
-router.get("/sent", auth, async (req, res, next) => {
-  try {
-    const sentEmails = await Email.find({
-      sender: req.user.email,
-      archived: false,
-    }).sort({ sentAt: -1 });
-
-    res.json(sentEmails);
-  } catch (error) {
-    console.error("Error fetching sent emails:", error);
-    res.status(500).json({ message: "Internal server error" });
-    next(error);
-  }
-});
-
 router.get("/inbox", auth, async (req, res, next) => {
+  const userEmail = req.user.email;
+
   try {
     const receivedEmails = await Email.find({
-      recipients: req.user.email,
+      recipients: userEmail,
+      sender: { $ne: userEmail },
       archived: false,
     }).sort({ sentAt: -1 });
 
     res.json(receivedEmails);
   } catch (error) {
     console.error("Error fetching received emails:", error);
+    res.status(500).json({ message: "Internal server error" });
+    next(error);
+  }
+});
+
+router.get("/sent", auth, async (req, res, next) => {
+  const userEmail = req.user.email;
+
+  try {
+    const sentEmails = await Email.find({
+      sender: userEmail,
+      archived: false,
+    }).sort({ sentAt: -1 });
+
+    res.json(sentEmails);
+  } catch (error) {
+    console.error("Error fetching sent emails:", error);
     res.status(500).json({ message: "Internal server error" });
     next(error);
   }
