@@ -7,33 +7,38 @@ import MongoStore from "connect-mongo";
 import errorHandler from "./middleware/errorHandler.js";
 import userRoutes from "./routes/user.js";
 import emailRoutes from "./routes/emails.js";
+import dotenv from "dotenv";
+
+dotenv.config({ path: "./config/.env" });
 
 const app = express();
 
 app.use(express.json());
 
-const allowedOrigins = ["http://localhost:5173"];
+const allowedOrigins = process.env.ALLOWED_ORIGINS.split(",");
 
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-    credentials: true,
-  })
-);
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+};
+
+app.use(cors(corsOptions));
+
 app.use(cookieParser());
 
-const mongoUrl = "mongodb://127.0.0.1:27017/session";
+const mongoUrl = process.env.MONGODB_URL;
 const store = MongoStore.create({ mongoUrl });
-
 app.use(
   session({
-    secret: "your_secret_key",
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     store: store,
@@ -43,16 +48,16 @@ app.use(
 
 app.use("/user", userRoutes);
 app.use("/emails", emailRoutes);
-app.use("/", emailRoutes);
-
 app.use(errorHandler);
 
 mongoose
-  .connect("mongodb://127.0.0.1:27017/email")
+  .connect(process.env.MONGODB_URL)
   .then(() => {
     console.log("Connected to MongoDB");
-    app.listen(3000, () => {
-      console.log("Server is running on port 3000");
+    app.listen(process.env.PORT, () => {
+      console.log(`Server running on port ${process.env.EXPRESS_PORT}`);
     });
   })
-  .catch((err) => console.error("Error connecting to MongoDB:", err));
+  .catch((err) => {
+    console.error("Error connecting to MongoDB:", err);
+  });

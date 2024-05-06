@@ -8,6 +8,7 @@ export const SentPage = () => {
   const [sentEmails, setSentEmails] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [openEmailId, setOpenEmailId] = useState(null);
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
 
@@ -15,7 +16,7 @@ export const SentPage = () => {
     console.log("User object:", user);
     console.log("User token:", user ? user.token : "undefined");
 
-    if (!user || !user.token) {
+    if (!user) {
       console.error("User or token is missing. Cannot fetch sent emails.");
       return;
     }
@@ -60,14 +61,43 @@ export const SentPage = () => {
     );
   }
 
+  const handleEmailClick = (emailId) => {
+    setOpenEmailId((prevId) => (prevId === emailId ? null : emailId));
+  };
+
   return (
     <div>
       <h2>Sent Emails</h2>
       <ul>
         {sentEmails.map((email) => (
-          <li key={email._id}>
-            <strong>{email.subject}</strong> - {email.body}
-          </li>
+          <div
+            key={email._id}
+            onClick={() => handleEmailClick(email._id)}
+            style={{
+              padding: "10px",
+              marginBottom: "10px",
+              border: "1px solid #ccc",
+              borderRadius: "5px",
+              cursor: "pointer",
+            }}
+          >
+            <strong>{email.subject}</strong>
+
+            {openEmailId === email._id && (
+              <div style={{ marginTop: "10px" }}>
+                <p>{email.body}</p>
+                <p>
+                  <strong>From: {email.sender}</strong> {email.from}
+                </p>
+                <p>
+                  <strong>To: {email.recipients}</strong> {email.to}
+                </p>
+                <p>
+                  <strong>Date: {email.sentAt} </strong> {email.date}
+                </p>
+              </div>
+            )}
+          </div>
         ))}
       </ul>
     </div>

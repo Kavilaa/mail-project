@@ -42,6 +42,38 @@ export const InboxPage = () => {
     setOpenEmailId((prevId) => (prevId === emailId ? null : emailId));
   };
 
+  const handleDelete = async (emailId) => {
+    try {
+      const headers = {
+        Authorization: `Bearer ${user?.token}`,
+      };
+
+      await axiosInstance.delete(`/emails/${emailId}`, { headers });
+
+      setEmails((prevEmails) =>
+        prevEmails.filter((email) => email._id !== emailId)
+      );
+    } catch (err) {
+      console.error("Error deleting email:", err);
+    }
+  };
+
+  const handleDeleteAll = async () => {
+    try {
+      const headers = {
+        Authorization: `Bearer ${user?.token}`,
+      };
+
+      for (const email of emails) {
+        await axiosInstance.delete(`/emails/${email._id}`, { headers });
+      }
+
+      setEmails([]);
+    } catch (err) {
+      console.error("Error deleting all emails:", err);
+    }
+  };
+
   if (loading) {
     return <div>Loading emails...</div>;
   }
@@ -78,6 +110,7 @@ export const InboxPage = () => {
   return (
     <div>
       <h2>Your Emails</h2>
+      <button onClick={handleDeleteAll}>Delete All</button>{" "}
       <div>
         {emails.map((email) => (
           <div
@@ -108,6 +141,8 @@ export const InboxPage = () => {
                 <button onClick={() => handleArchive(email._id)}>
                   Archive
                 </button>
+                <br />
+                <button onClick={() => handleDelete(email._id)}>Delete</button>
               </div>
             )}
           </div>
