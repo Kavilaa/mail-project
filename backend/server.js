@@ -15,22 +15,7 @@ const app = express();
 
 app.use(express.json());
 
-const allowedOrigins = process.env.ALLOWED_ORIGINS.split(",");
-
-const corsOptions = {
-  origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
-};
-
-app.use(cors(corsOptions));
+app.use(cors({ origin: process.env.ALLOWED_ORIGIN, credentials: true }));
 
 app.use(cookieParser());
 
@@ -54,7 +39,7 @@ mongoose
   .connect(process.env.MONGODB_URL)
   .then(() => {
     console.log("Connected to MongoDB");
-    app.listen(process.env.PORT, () => {
+    app.listen(process.env.EXPRESS_PORT, () => {
       console.log(`Server running on port ${process.env.EXPRESS_PORT}`);
     });
   })
