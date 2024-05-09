@@ -35,7 +35,7 @@ export const ComposePage = () => {
 
   const handleSubmit = async (values) => {
     try {
-      const response = await axiosInstance.post("/emails/compose", values);
+      const response = await axiosInstance.post("/emails/c/compose", values);
 
       console.log("Email sent successfully:", response.data);
       navigate("/");

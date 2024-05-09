@@ -13,34 +13,39 @@ dotenv.config({ path: "./config/.env" });
 
 const app = express();
 
+// Parse incoming JSON requests
 app.use(express.json());
 
-app.use(cors({ origin: process.env.ALLOWED_ORIGIN, credentials: true }));
+// CORS Configuration
+const corsOptions = {
+  origin: process.env.ALLOWED_ORIGIN || "http://localhost:5173",
+  credentials: true,
+};
+app.use(cors(corsOptions));
 
 app.use(cookieParser());
 
-const mongoUrl = process.env.MONGODB_URL;
-const store = MongoStore.create({ mongoUrl });
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: false,
-    store: store,
-    cookie: { maxAge: 24 * 60 * 60 * 1000 },
-  })
-);
+const sessionOptions = {
+  secret: process.env.SESSION_SECRET || "your_default_secret",
+  resave: false,
+  saveUninitialized: false,
+  store: MongoStore.create({ mongoUrl: process.env.MONGODB_URL }),
+  cookie: { maxAge: 24 * 60 * 60 * 1000 }, // Cookie expiration in milliseconds
+};
+app.use(session(sessionOptions));
 
 app.use("/user", userRoutes);
 app.use("/emails", emailRoutes);
+
 app.use(errorHandler);
 
 mongoose
-  .connect(process.env.MONGODB_URL)
+  .connect(process.env.MONGODB_URL, {})
   .then(() => {
     console.log("Connected to MongoDB");
-    app.listen(process.env.EXPRESS_PORT, () => {
-      console.log(`Server running on port ${process.env.EXPRESS_PORT}`);
+    const port = process.env.EXPRESS_PORT || 3000;
+    app.listen(port, () => {
+      console.log(`Server running on port ${port}`);
     });
   })
   .catch((err) => {

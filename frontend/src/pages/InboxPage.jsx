@@ -3,6 +3,7 @@ import { axiosInstance } from "../lib/axiosInstance";
 import { useContext } from "react";
 import { AuthContext } from "../components/AuthContext";
 import { useNavigate } from "react-router-dom";
+import trash from "../assets/trash.svg";
 
 export const InboxPage = () => {
   const [emails, setEmails] = useState([]);
@@ -18,7 +19,7 @@ export const InboxPage = () => {
         Authorization: `Bearer ${user.token}`,
       };
 
-      const response = await axiosInstance.get("/c/inbox", { headers });
+      const response = await axiosInstance.get("/emails/c/inbox", { headers });
       setEmails(response.data);
       setError(null);
     } catch (err) {
@@ -48,6 +49,11 @@ export const InboxPage = () => {
         Authorization: `Bearer ${user?.token}`,
       };
 
+      if (!emailId || typeof emailId !== "string") {
+        console.error("Invalid email ID:", emailId);
+        return;
+      }
+
       await axiosInstance.delete(`/emails/${emailId}`, { headers });
 
       setEmails((prevEmails) =>
@@ -63,11 +69,7 @@ export const InboxPage = () => {
       const headers = {
         Authorization: `Bearer ${user?.token}`,
       };
-
-      for (const email of emails) {
-        await axiosInstance.delete(`/emails/${email._id}`, { headers });
-      }
-
+      await axiosInstance.delete(`/emails/inbox/deleteall`, { headers });
       setEmails([]);
     } catch (err) {
       console.error("Error deleting all emails:", err);
@@ -109,8 +111,15 @@ export const InboxPage = () => {
 
   return (
     <div>
-      <h2>Your Emails</h2>
-      <button onClick={handleDeleteAll}>Delete All</button>{" "}
+      <div className="flex justify-between items-center">
+        <h2>Your Emails</h2>
+        <button
+          onClick={handleDeleteAll}
+          className="text-red-500 hover:text-red-700"
+        >
+          Delete All
+        </button>{" "}
+      </div>
       <div>
         {emails.map((email) => (
           <div
@@ -124,7 +133,12 @@ export const InboxPage = () => {
               cursor: "pointer",
             }}
           >
-            <strong>{email.subject}</strong>
+            <div className="flex justify-between items-center">
+              <strong>{email.subject}</strong>
+              <button onClick={() => handleDelete(email._id)}>
+                <img src={trash} alt="" />
+              </button>
+            </div>
 
             {openEmailId === email._id && (
               <div style={{ marginTop: "10px" }}>
@@ -138,11 +152,28 @@ export const InboxPage = () => {
                 <p>
                   <strong>Date: {email.sentAt} </strong> {email.date}
                 </p>
-                <button onClick={() => handleArchive(email._id)}>
-                  Archive
-                </button>
-                <br />
-                <button onClick={() => handleDelete(email._id)}>Delete</button>
+                <div className="flex space-x-2">
+                  <button
+                    className="border-gray-500 text-gray-500 border px-4 py-2 rounded-md hover:bg-gray-100 transition duration-200"
+                    onClick={() => handleReply(email._id)}
+                  >
+                    Reply
+                  </button>
+
+                  <button
+                    className="border-blue-500 text-blue-500 border px-4 py-2 rounded-md hover:bg-blue-100 transition duration-200"
+                    onClick={() => handleArchive(email._id)}
+                  >
+                    Archive
+                  </button>
+
+                  <button
+                    className="border-red-500 text-red-500 border px-4 py-2 rounded-md hover:bg-red-100 transition duration-200"
+                    onClick={() => handleDelete(email._id)}
+                  >
+                    Delete
+                  </button>
+                </div>
               </div>
             )}
           </div>
