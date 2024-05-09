@@ -135,13 +135,6 @@ export const ArchivedPage = () => {
                 </p>
                 <div className="flex space-x-2">
                   <button
-                    className="border-gray-500 text-gray-500 border px-4 py-2 rounded-md hover:bg-gray-100 transition duration-200"
-                    onClick={() => handleReply(email._id)}
-                  >
-                    Reply
-                  </button>
-
-                  <button
                     className="border-blue-500 text-blue-500 border px-4 py-2 rounded-md hover:bg-blue-100 transition duration-200"
                     onClick={() => handleUnarchive(email._id)}
                   >

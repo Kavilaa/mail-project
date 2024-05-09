@@ -1,7 +1,7 @@
 import React from "react";
 import { Form, Formik, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { axiosInstance } from "../lib/axiosInstance";
 import { useContext } from "react";
 import { AuthContext } from "../components/AuthContext";
@@ -10,10 +10,16 @@ import { Label } from "../components/ui/label";
 import { Input } from "../components/ui/input";
 
 export const ComposePage = () => {
+  const navigate = useNavigate();
+  const location = useLocation(); // Get the state passed from navigation
+  const { state } = location;
+
+  const { user } = useContext(AuthContext);
+
   const initialValues = {
-    recipients: "",
-    subject: "",
-    body: "",
+    recipients: state?.recipients || "",
+    subject: state?.subject || "",
+    body: state?.body || "",
   };
 
   const validationSchema = Yup.object().shape({
@@ -30,8 +36,6 @@ export const ComposePage = () => {
       .min(3, "Body must be at least 3 characters")
       .required("Body is required"),
   });
-
-  const navigate = useNavigate();
 
   const handleSubmit = async (values) => {
     try {
@@ -64,6 +68,7 @@ export const ComposePage = () => {
                 type="text"
                 {...formikProps.getFieldProps("recipients")}
                 placeholder="Enter recipient emails, separated by commas"
+                readOnly={Boolean(state)} // Add read-only attribute based on state
               />
               <ErrorMessage
                 name="recipients"
@@ -80,6 +85,7 @@ export const ComposePage = () => {
                 type="text"
                 {...formikProps.getFieldProps("subject")}
                 placeholder="Enter subject"
+                readOnly={Boolean(state)} // Add read-only attribute based on state
               />
               <ErrorMessage
                 name="subject"

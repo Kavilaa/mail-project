@@ -128,6 +128,43 @@ export const SentPage = () => {
     }
   };
 
+  const handleReply = (email) => {
+    console.log("Email object in handleReply:", email);
+    if (!email || !user) {
+      console.error("Email or user is undefined.");
+      return;
+    }
+
+    const prefilledSubject = `Re: ${email.subject}`;
+    const formattedBody = `----
+on ${email.sentAt}, ${email.sender} wrote:
+
+${email.body}
+---
+on ${email.sentAt}, ${email.recipients} Replied:
+`;
+    let recipients = [];
+    if (email.recipients) {
+      recipients = email.recipients.filter(
+        (recipient) => recipient !== user.email
+      );
+    }
+
+    if (email.sender && email.sender !== user.email) {
+      recipients.push(email.sender);
+    }
+
+    const recipientsString = recipients.join(", ");
+
+    navigate("/compose", {
+      state: {
+        recipients: recipientsString,
+        subject: prefilledSubject,
+        body: formattedBody,
+      },
+    });
+  };
+
   return (
     <div>
       <div className="flex justify-between items-center">
@@ -174,7 +211,7 @@ export const SentPage = () => {
                 <div className="flex space-x-2">
                   <button
                     className="border-gray-500 text-gray-500 border px-4 py-2 rounded-md hover:bg-gray-100 transition duration-200"
-                    onClick={() => handleReply(email._id)}
+                    onClick={() => handleReply(email)}
                   >
                     Reply
                   </button>
