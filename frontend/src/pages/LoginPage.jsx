@@ -1,7 +1,7 @@
+import { useEffect, useContext } from "react";
 import { Form, Formik, ErrorMessage } from "formik";
 import { Link, useNavigate } from "react-router-dom";
 import { axiosInstance } from "../lib/axiosInstance";
-import { useContext } from "react";
 import { AuthContext } from "../components/AuthContext";
 import { Button } from "../components/ui/button";
 import { Label } from "../components/ui/label";
@@ -9,6 +9,15 @@ import { Input } from "../components/ui/input";
 import * as Yup from "yup";
 
 export const LoginPage = () => {
+  const { user } = useContext(AuthContext);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user) {
+      navigate("/inbox");
+    }
+  }, [user, navigate]);
+
   const initialValues = {
     email: "",
     password: "",
@@ -22,7 +31,6 @@ export const LoginPage = () => {
   });
 
   const { setUser } = useContext(AuthContext);
-  const navigate = useNavigate();
 
   const loginUser = async (loginValues, { setSubmitting }) => {
     const response = await axiosInstance.post("/user/login", loginValues);

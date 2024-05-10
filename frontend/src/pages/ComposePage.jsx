@@ -11,7 +11,7 @@ import { Input } from "../components/ui/input";
 
 export const ComposePage = () => {
   const navigate = useNavigate();
-  const location = useLocation(); // Get the state passed from navigation
+  const location = useLocation();
   const { state } = location;
 
   const { user } = useContext(AuthContext);
@@ -68,7 +68,6 @@ export const ComposePage = () => {
                 type="text"
                 {...formikProps.getFieldProps("recipients")}
                 placeholder="Enter recipient emails, separated by commas"
-                readOnly={Boolean(state)} // Add read-only attribute based on state
               />
               <ErrorMessage
                 name="recipients"
@@ -85,7 +84,6 @@ export const ComposePage = () => {
                 type="text"
                 {...formikProps.getFieldProps("subject")}
                 placeholder="Enter subject"
-                readOnly={Boolean(state)} // Add read-only attribute based on state
               />
               <ErrorMessage
                 name="subject"

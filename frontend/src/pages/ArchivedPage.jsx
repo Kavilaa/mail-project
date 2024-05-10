@@ -1,38 +1,20 @@
-import React, { useState, useEffect } from "react";
-import { axiosInstance } from "../lib/axiosInstance";
-import { useContext } from "react";
+import React, { useState, useContext } from "react";
 import { AuthContext } from "../components/AuthContext";
-import trash from "../assets/trash.svg";
+import { FetchEmails } from "../components/FetchEmails";
+import { EmailList } from "../components/EmailList";
+import { EmailActions } from "../components/EmailActions";
+import { axiosInstance } from "../lib/axiosInstance";
 
 export const ArchivedPage = () => {
   const [archivedEmails, setArchivedEmails] = useState([]);
-  const { user } = useContext(AuthContext);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [openEmailId, setOpenEmailId] = useState(null);
-  const [emails, setEmails] = useState([]);
+  const { user } = useContext(AuthContext);
 
-  const fetchArchivedEmails = async () => {
-    try {
-      const headers = {
-        Authorization: `Bearer ${user?.token}`,
-      };
-
-      const response = await axiosInstance.get("/emails/c/archived", {
-        headers,
-      });
-
-      // console.log("Response data:", response.data);
-
-      setArchivedEmails(response.data);
-    } catch (err) {
-      console.error("Error fetching archived emails:", err);
-    }
+  const handleEmailClick = (emailId) => {
+    setOpenEmailId((prevId) => (prevId === emailId ? null : emailId));
   };
-
-  useEffect(() => {
-    if (user) {
-      fetchArchivedEmails();
-    }
-  }, [user]);
 
   const handleUnarchive = async (emailId) => {
     try {
@@ -40,13 +22,11 @@ export const ArchivedPage = () => {
         Authorization: `Bearer ${user?.token}`,
       };
 
-      const response = await axiosInstance.patch(
-        `/emails/${emailId}`,
-        {
-          archived: false,
-        },
-        { headers }
-      );
+      const body = {
+        archived: false,
+      };
+
+      await axiosInstance.patch(`/emails/${emailId}`, body, { headers });
 
       setArchivedEmails((prevEmails) =>
         prevEmails.filter((email) => email._id !== emailId)
@@ -54,10 +34,6 @@ export const ArchivedPage = () => {
     } catch (err) {
       console.error("Error unarchiving email:", err);
     }
-  };
-
-  const handleEmailClick = (emailId) => {
-    setOpenEmailId((prevId) => (prevId === emailId ? null : emailId));
   };
 
   const handleDelete = async (emailId) => {
@@ -76,83 +52,39 @@ export const ArchivedPage = () => {
     }
   };
 
-  const handleDeleteAll = async () => {
-    try {
-      const headers = {
-        Authorization: `Bearer ${user?.token}`,
-      };
-
-      await axiosInstance.delete(`/emails/archived/deleteall`, { headers });
-
-      setArchivedEmails([]);
-    } catch (err) {
-      console.error("Error deleting all archived emails:", err);
-    }
-  };
-
   return (
     <div>
       <div className="flex justify-between items-center">
         <h2>Archived Emails</h2>
-        <button
-          onClick={handleDeleteAll}
-          className="text-red-500 hover:text-red-700"
-        >
-          Delete All
-        </button>{" "}
+        <EmailActions
+          user={user}
+          deleteEndpoint="/emails/archived/deleteall"
+          onEmailsDeleted={() => setArchivedEmails([])}
+        />
       </div>
-      <div>
-        {archivedEmails.map((email) => (
-          <div
-            key={email._id}
-            onClick={() => handleEmailClick(email._id)}
-            style={{
-              padding: "10px",
-              marginBottom: "10px",
-              border: "1px solid #ccc",
-              borderRadius: "5px",
-              cursor: "pointer",
-            }}
-          >
-            <div className="flex justify-between items-center">
-              <strong>{email.subject}</strong>
-              <button onClick={() => handleDelete(email._id)}>
-                <img src={trash} alt="" />
-              </button>
-            </div>
-
-            {openEmailId === email._id && (
-              <div style={{ marginTop: "10px" }}>
-                <p>{email.body}</p>
-                <p>
-                  <strong>From: {email.sender}</strong> {email.from}
-                </p>
-                <p>
-                  <strong>To: {email.recipients}</strong> {email.to}
-                </p>
-                <p>
-                  <strong>Date: {email.sentAt} </strong> {email.date}
-                </p>
-                <div className="flex space-x-2">
-                  <button
-                    className="border-blue-500 text-blue-500 border px-4 py-2 rounded-md hover:bg-blue-100 transition duration-200"
-                    onClick={() => handleUnarchive(email._id)}
-                  >
-                    Unarchive
-                  </button>
-
-                  <button
-                    className="border-red-500 text-red-500 border px-4 py-2 rounded-md hover:bg-red-100 transition duration-200"
-                    onClick={() => handleDelete(email._id)}
-                  >
-                    Delete
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
+      <FetchEmails
+        user={user}
+        endpoint="/emails/c/archived"
+        setEmails={setArchivedEmails}
+        setLoading={setLoading}
+        setError={setError}
+      />
+      {loading ? (
+        <div>Loading archived emails...</div>
+      ) : error ? (
+        <div>
+          <p>Error fetching archived emails. Please try again later.</p>
+          <button onClick={fetchEmails}>Retry</button>
+        </div>
+      ) : (
+        <EmailList
+          emails={archivedEmails}
+          openEmailId={openEmailId}
+          onEmailClick={handleEmailClick}
+          onDelete={handleDelete}
+          onUnarchive={handleUnarchive}
+        />
+      )}
     </div>
   );
 };
