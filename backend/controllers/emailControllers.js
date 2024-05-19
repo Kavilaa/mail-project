@@ -19,31 +19,61 @@ const composeEmail = asyncHandler(async (req, res) => {
   res.status(201).json(email);
 });
 
-const getInboxEmails = asyncHandler(async (req, res) => {
-  const receivedEmails = await Email.find({
-    recipients: req.user.email,
-    archived: false,
-  }).sort({ sentAt: -1 });
+// const getInboxEmails = asyncHandler(async (req, res) => {
+//   const receivedEmails = await Email.find({
+//     recipients: req.user.email,
+//     archived: false,
+//   }).sort({ sentAt: -1 });
 
-  res.json(receivedEmails);
-});
+//   res.json(receivedEmails);
+// });
 
-const getSentEmails = asyncHandler(async (req, res) => {
-  const sentEmails = await Email.find({
-    sender: req.user.email,
-    archived: false,
-  }).sort({ sentAt: -1 });
+// const getSentEmails = asyncHandler(async (req, res) => {
+//   const sentEmails = await Email.find({
+//     sender: req.user.email,
+//     archived: false,
+//   }).sort({ sentAt: -1 });
 
-  res.json(sentEmails);
-});
+//   res.json(sentEmails);
+// });
 
-const getArchivedEmails = asyncHandler(async (req, res) => {
-  const archivedEmails = await Email.find({
-    $or: [{ recipients: req.user.email }, { sender: req.user.email }],
-    archived: true,
-  }).sort({ sentAt: -1 });
+// const getArchivedEmails = asyncHandler(async (req, res) => {
+//   const archivedEmails = await Email.find({
+//     $or: [{ recipients: req.user.email }, { sender: req.user.email }],
+//     archived: true,
+//   }).sort({ sentAt: -1 });
 
-  res.json(archivedEmails);
+//   res.json(archivedEmails);
+// });
+
+const getEmailsByCategory = asyncHandler(async (req, res) => {
+  const { emailCategory } = req.params;
+  let emails;
+
+  switch (emailCategory) {
+    case "inbox":
+      emails = await Email.find({
+        recipients: req.user.email,
+        archived: false,
+      }).sort({ sentAt: -1 });
+      break;
+    case "sent":
+      emails = await Email.find({
+        sender: req.user.email,
+        archived: false,
+      }).sort({ sentAt: -1 });
+      break;
+    case "archived":
+      emails = await Email.find({
+        $or: [{ recipients: req.user.email }, { sender: req.user.email }],
+        archived: true,
+      }).sort({ sentAt: -1 });
+      break;
+    default:
+      return res.status(400).json({ message: "Invalid email category" });
+  }
+
+  res.json(emails);
 });
 
 const updateEmailArchiveStatus = asyncHandler(async (req, res) => {
@@ -71,11 +101,13 @@ const updateEmailArchiveStatus = asyncHandler(async (req, res) => {
 });
 
 const getEmailById = asyncHandler(async (req, res) => {
-  const email = await Email.findById(req.params.emailId);
+  const email = await Email.findOne({
+    _id: req.params.emailId,
+    $or: [{ recipients: req.user._id }, { sender: req.user._id }],
+  });
 
   if (!email) {
-    res.status(404).json({ message: "Email not found" });
-    return;
+    return res.status(404).json({ message: "Email not found" });
   }
 
   res.json(email);
@@ -151,9 +183,10 @@ const deleteAllArchivedEmails = asyncHandler(async (req, res) => {
 
 export default {
   composeEmail,
-  getInboxEmails,
-  getSentEmails,
-  getArchivedEmails,
+  // getInboxEmails,
+  // getSentEmails,
+  // getArchivedEmails,
+  getEmailsByCategory,
   updateEmailArchiveStatus,
   getEmailById,
   deleteEmail,

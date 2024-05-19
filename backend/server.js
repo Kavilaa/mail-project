@@ -13,10 +13,8 @@ dotenv.config({ path: "./config/.env" });
 
 const app = express();
 
-// Parse incoming JSON requests
 app.use(express.json());
 
-// CORS Configuration
 const corsOptions = {
   origin: process.env.ALLOWED_ORIGIN || "http://localhost:5173",
   credentials: true,
@@ -30,7 +28,7 @@ const sessionOptions = {
   resave: false,
   saveUninitialized: false,
   store: MongoStore.create({ mongoUrl: process.env.MONGODB_URL }),
-  cookie: { maxAge: 24 * 60 * 60 * 1000 }, // Cookie expiration in milliseconds
+  cookie: { maxAge: 24 * 60 * 60 * 1000 },
 };
 app.use(session(sessionOptions));
 

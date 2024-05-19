@@ -27,13 +27,17 @@ const ProtectedRoute = () => {
     return <Outlet />;
   }
 
-  return <Navigate to="/" />;
+  return <Navigate to="/login" />;
 };
 
 export const App = () => {
   const router = createBrowserRouter(
     createRoutesFromElements(
       <Route path="/" element={<RootLayout />}>
+        <Route
+          index
+          element={<Navigate to="/inbox" />} // Redirect to inbox page on first load
+        />
         <Route element={<ProtectedRoute />}>
           <Route path="/inbox" element={<InboxPage />} />
           <Route path="/sent" element={<SentPage />} />

@@ -5,9 +5,10 @@ import emailController from "../controllers/emailControllers.js";
 const router = express.Router();
 
 router.post("/c/compose", auth, emailController.composeEmail);
-router.get("/c/inbox", auth, emailController.getInboxEmails);
-router.get("/c/sent", auth, emailController.getSentEmails);
-router.get("/c/archived", auth, emailController.getArchivedEmails);
+// router.get("/c/inbox", auth, emailController.getInboxEmails);
+// router.get("/c/sent", auth, emailController.getSentEmails);
+// router.get("/c/archived", auth, emailController.getArchivedEmails);
+router.get("/c/:emailCategory", auth, emailController.getEmailsByCategory);
 router.patch("/:emailId", auth, emailController.updateEmailArchiveStatus);
 router.get("/:emailId", auth, emailController.getEmailById);
 router.delete("/:emailId", auth, emailController.deleteEmail);

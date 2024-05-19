@@ -42,7 +42,7 @@ export const EmailList = ({
                 <strong>From: {email.sender}</strong> {email.from}
               </p>
               <p>
-                <strong>To: {email.recipients}</strong> {email.to}
+                <strong>To: {email.recipients.join(",")} </strong> {email.to}
               </p>
               <p>
                 <strong>Date: {email.sentAt} </strong> {email.date}

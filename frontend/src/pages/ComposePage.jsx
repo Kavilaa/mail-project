@@ -39,13 +39,19 @@ export const ComposePage = () => {
 
   const handleSubmit = async (values) => {
     try {
-      const response = await axiosInstance.post("/emails/c/compose", values);
+      const recipientsArray = values.recipients.split(",");
+
+      const data = {
+        ...values,
+        recipients: recipientsArray, // Assign the array of recipients to the 'recipients' field
+      };
+
+      const response = await axiosInstance.post("/emails/c/compose", data);
 
       console.log("Email sent successfully:", response.data);
       navigate("/");
     } catch (error) {
       console.error("Error sending email:", error);
-
       alert("Failed to send email. Please try again later.");
     }
   };
